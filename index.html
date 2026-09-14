@@ -1,0 +1,731 @@
+<title>Boarding Call</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --navy-900:#12172a;
+    --navy-700:#3a4160;
+    --paper-050:#eef0f3;
+    --paper-100:#ffffff;
+    --paper-300:#d7dbe2;
+    --amber-500:#e8960a;
+    --amber-600:#c97e06;
+    --teal-600:#128585;
+    --teal-500:#1aa6a6;
+
+    --bg: var(--paper-050);
+    --surface: var(--paper-100);
+    --surface-sunken: var(--paper-050);
+    --text-primary: var(--navy-900);
+    --text-secondary: var(--navy-700);
+    --text-muted: #6b7284;
+    --border: var(--paper-300);
+    --seat-empty: var(--paper-300);
+    --seat-empty-border: #c2c7d1;
+    --case1-accent: var(--amber-600);
+    --case2-accent: var(--teal-600);
+    --track-bg: #e3e6ec;
+    --shadow: 0 1px 2px rgba(18,23,42,0.06), 0 8px 24px -12px rgba(18,23,42,0.18);
+    --cell: 16px;
+    --gap: 2px;
+    --rowh: calc(var(--cell) * 1.3);
+    --headh: 15px;
+    color-scheme: light dark;
+  }
+
+  @media (max-width:520px){ :root{ --cell:10px; } }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0d111f; --surface:#171d31; --surface-sunken:#12172a;
+      --text-primary:#eef0f5; --text-secondary:#aab0c4; --text-muted:#7c839c;
+      --border:#2a3150; --seat-empty:#232b48; --seat-empty-border:#333c60;
+      --case1-accent:#f5ab2e; --case2-accent:#2bc4c4; --track-bg:#1e2540;
+      --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 12px 28px -14px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0d111f; --surface:#171d31; --surface-sunken:#12172a;
+    --text-primary:#eef0f5; --text-secondary:#aab0c4; --text-muted:#7c839c;
+    --border:#2a3150; --seat-empty:#232b48; --seat-empty-border:#333c60;
+    --case1-accent:#f5ab2e; --case2-accent:#2bc4c4; --track-bg:#1e2540;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 12px 28px -14px rgba(0,0,0,0.6);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text-primary);
+    font-family:'Overpass',system-ui,-apple-system,'Segoe UI',sans-serif;
+    padding-inline:20px; padding-block:28px 48px;
+  }
+  .wrap{max-width:980px;margin:0 auto;}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;}
+
+  .masthead{
+    display:flex; justify-content:space-between; align-items:flex-end; gap:16px;
+    flex-wrap:wrap; border-bottom:2px solid var(--text-primary);
+    padding-bottom:14px; margin-bottom:8px;
+  }
+  h1{font-size:clamp(28px,4vw,40px); font-weight:800; letter-spacing:-0.02em; text-wrap:balance; margin:0 0 4px;}
+  .tagline{margin:0;color:var(--text-secondary);font-size:15px;max-width:52ch;}
+  .ticket-strip{
+    display:flex; gap:14px; align-items:center; font-family:'IBM Plex Mono',monospace;
+    font-size:11px; letter-spacing:0.06em; color:var(--text-muted); text-transform:uppercase;
+  }
+  .ticket-strip b{color:var(--text-secondary);font-weight:600;}
+  .barcode{display:flex;align-items:flex-end;gap:1px;height:22px;}
+  .barcode i{display:block;width:2px;background:var(--text-secondary);opacity:.6;}
+
+  .controls{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:12px 16px; margin:20px 0 24px; box-shadow:var(--shadow);
+  }
+  .field{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-secondary);}
+  select.mono{
+    font-size:12.5px; font-weight:600; letter-spacing:.02em;
+    border:1px solid var(--text-primary); border-radius:7px; background:var(--surface);
+    color:var(--text-primary); padding:8px 10px; max-width:340px;
+  }
+  select.mono:focus-visible{outline:3px solid var(--case2-accent); outline-offset:2px;}
+  .btn{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600; letter-spacing:.03em;
+    text-transform:uppercase; border:1px solid var(--text-primary);
+    background:var(--text-primary); color:var(--surface);
+    padding:9px 16px; border-radius:7px; cursor:pointer;
+    transition:transform .12s ease, opacity .12s ease;
+  }
+  .btn:hover{opacity:.85;}
+  .btn:active{transform:scale(0.97);}
+  .btn.ghost{background:transparent;color:var(--text-primary);}
+  .btn:focus-visible{outline:3px solid var(--case2-accent); outline-offset:2px;}
+  .speed-group{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-secondary);}
+  .speed-group input[type=range]{accent-color:var(--text-primary); width:110px;}
+  .speed-val{font-family:'IBM Plex Mono',monospace;min-width:34px;display:inline-block;}
+
+  .planes{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media (max-width:720px){ .planes{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column;
+  }
+  .panel-head{padding:16px 18px 12px;}
+  .panel[data-case="1"] .case-name{color:var(--case1-accent);}
+  .panel[data-case="2"] .case-name{color:var(--case2-accent);}
+  .case-eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600;}
+  .case-name{font-size:19px;font-weight:700;margin:2px 0 10px;}
+
+  .phases{display:flex;gap:6px;flex-wrap:wrap;align-content:flex-start;min-height:54px;margin-bottom:12px;}
+  .phase-chip{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.02em;
+    border:1px solid var(--border); color:var(--text-muted);
+    padding:4px 8px; border-radius:999px; background:var(--surface-sunken);
+    transition:background .2s, color .2s, border-color .2s;
+  }
+  .panel[data-case="1"] .phase-chip.active{background:var(--case1-accent);border-color:var(--case1-accent);color:#1a1200;}
+  .panel[data-case="2"] .phase-chip.active{background:var(--case2-accent);border-color:var(--case2-accent);color:#001c1c;}
+  .phase-chip.done{color:var(--text-secondary);}
+
+  .now-boarding{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600;
+    color:var(--text-secondary); letter-spacing:.03em; min-height:16px; margin-bottom:10px;
+  }
+  .now-boarding .flash{color:var(--text-primary);}
+
+  .plane-shell{padding:0 18px; overflow-x:auto;}
+  .plane-grid{
+    position:relative; display:grid; grid-template-rows:var(--headh); grid-auto-rows:var(--rowh); gap:var(--gap);
+    width:fit-content; margin-inline:auto; border-radius:6px;
+  }
+  .col-label{
+    display:flex; align-items:flex-end; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:9px; line-height:1; color:var(--text-muted);
+  }
+  .seat{background:var(--seat-empty); border:1px solid var(--seat-empty-border); border-radius:2px; transition:background .35s ease, border-color .35s ease;}
+  .seat.band{filter:brightness(0.985);}
+  .aisle-cell{background:transparent;}
+  .panel[data-case="1"] .seat.seated{background:var(--case1-accent); border-color:var(--case1-accent);}
+  .panel[data-case="2"] .seat.seated{background:var(--case2-accent); border-color:var(--case2-accent);}
+
+  .token-layer{position:absolute; inset:0; pointer-events:none;}
+  .token{
+    position:absolute;
+    left:calc(var(--acol) * (var(--cell) + var(--gap)));
+    top:calc(var(--headh) + var(--gap) + (var(--arow) - 1) * (var(--rowh) + var(--gap)));
+    width:var(--cell); height:var(--rowh);
+    display:flex; align-items:center; justify-content:center;
+    transition:top .28s linear;
+  }
+  .token .dot{width:62%; aspect-ratio:1/1; border-radius:50%; box-shadow:0 0 0 2px var(--surface);}
+  .panel[data-case="1"] .token .dot{background:var(--case1-accent);}
+  .panel[data-case="2"] .token .dot{background:var(--case2-accent);}
+  .token.stowing .dot{animation:pulse 0.9s ease-in-out infinite;}
+  @keyframes pulse{
+    0%,100%{box-shadow:0 0 0 2px var(--surface);}
+    50%{box-shadow:0 0 0 5px var(--surface);}
+  }
+
+  .perforation{margin:16px 0 0; border:none; border-top:2px dashed var(--border); position:relative;}
+  .perforation::before,.perforation::after{content:""; position:absolute; top:-7px; width:14px; height:14px; border-radius:50%; background:var(--bg);}
+  .perforation::before{left:-25px;}
+  .perforation::after{right:-25px;}
+
+  .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:0; padding:14px 18px 18px;}
+  .stat{padding:0 10px; border-left:1px solid var(--border);}
+  .stat:first-child{border-left:none;padding-left:0;}
+  .stat-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);}
+  .stat-value{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:2px;}
+
+  .progress-track{height:6px;border-radius:4px;background:var(--track-bg);overflow:hidden;margin:16px 18px;}
+  .progress-fill{height:100%;width:0%;border-radius:4px;transition:width .25s linear;}
+  .panel[data-case="1"] .progress-fill{background:var(--case1-accent);}
+  .panel[data-case="2"] .progress-fill{background:var(--case2-accent);}
+
+  .results{
+    margin-top:26px; background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    box-shadow:var(--shadow); padding:22px 24px; opacity:0; transform:translateY(8px);
+    transition:opacity .4s ease, transform .4s ease; pointer-events:none;
+  }
+  .results.show{opacity:1;transform:translateY(0);pointer-events:auto;}
+  .results h2{margin:0 0 4px;font-size:20px;font-weight:700;}
+  .results .sub{color:var(--text-secondary);font-size:13px;margin:0 0 18px;}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .bar-label{width:190px;flex-shrink:0;font-size:13px;font-weight:600;}
+  .bar-track{flex:1;background:var(--track-bg);border-radius:6px;height:28px;position:relative;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;transition:width 1s cubic-bezier(.2,.8,.2,1);}
+  .bar-fill span{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--surface);white-space:nowrap;}
+  #bar1 .bar-fill{background:var(--case1-accent);}
+  #bar2 .bar-fill{background:var(--case2-accent);}
+  .verdict{margin-top:16px; padding-top:16px; border-top:1px solid var(--border); font-size:15px; line-height:1.55; text-wrap:balance;}
+  .verdict b{color:var(--text-primary);}
+  .note{margin-top:10px;font-size:12.5px;color:var(--text-muted);line-height:1.5;}
+
+  @media (prefers-reduced-motion:reduce){
+    .token{transition:none;}
+    .token.stowing .dot{animation:none;}
+    .results{transition:none;}
+    .bar-fill{transition:none;}
+  }
+</style>
+
+<div class="wrap">
+  <div class="masthead">
+    <div>
+      <h1>Boarding Call</h1>
+      <p class="tagline">Two boarding orders race down the same plane, seat by seat, so you can see exactly where the minutes go.</p>
+    </div>
+    <div class="ticket-strip">
+      <div>AIRCRAFT<br><b id="ticket-config">&nbsp;</b></div>
+      <div>FLIGHT<br><b id="ticket-flight">&nbsp;</b></div>
+      <div class="barcode" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="field">
+      <label for="aircraft" class="mono">Aircraft</label>
+      <select id="aircraft" class="mono"></select>
+    </div>
+    <button class="btn" id="playBtn">Pause</button>
+    <button class="btn ghost" id="reshuffleBtn">New Passengers ↻</button>
+    <div class="speed-group">
+      <label for="speed">Speed</label>
+      <input type="range" id="speed" min="1" max="4" step="1" value="2">
+      <span class="speed-val mono" id="speedVal">2×</span>
+    </div>
+  </div>
+
+  <div class="planes">
+    <section class="panel" data-case="1">
+      <div class="panel-head">
+        <div class="case-eyebrow">Case 1</div>
+        <h2 class="case-name">Window &rarr; Middle &rarr; Aisle</h2>
+        <div class="phases" id="phases-1"></div>
+        <div class="now-boarding" id="now-1"></div>
+      </div>
+      <div class="plane-shell">
+        <div class="plane-grid" id="grid-1">
+          <div class="token-layer" id="tokens-1"></div>
+        </div>
+      </div>
+      <hr class="perforation">
+      <div class="progress-track"><div class="progress-fill" id="progress-1"></div></div>
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Seated</div><div class="stat-value mono"><span id="seated-1">0</span>/<span id="total-1">0</span></div></div>
+        <div class="stat"><div class="stat-label">Elapsed</div><div class="stat-value mono" id="time-1">0:00</div></div>
+        <div class="stat"><div class="stat-label">Seat conflicts</div><div class="stat-value mono" id="conflict-1">0</div></div>
+      </div>
+    </section>
+
+    <section class="panel" data-case="2">
+      <div class="panel-head">
+        <div class="case-eyebrow">Case 2</div>
+        <h2 class="case-name">Back &rarr; Middle &rarr; Front</h2>
+        <div class="phases" id="phases-2"></div>
+        <div class="now-boarding" id="now-2"></div>
+      </div>
+      <div class="plane-shell">
+        <div class="plane-grid" id="grid-2">
+          <div class="token-layer" id="tokens-2"></div>
+        </div>
+      </div>
+      <hr class="perforation">
+      <div class="progress-track"><div class="progress-fill" id="progress-2"></div></div>
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Seated</div><div class="stat-value mono"><span id="seated-2">0</span>/<span id="total-2">0</span></div></div>
+        <div class="stat"><div class="stat-label">Elapsed</div><div class="stat-value mono" id="time-2">0:00</div></div>
+        <div class="stat"><div class="stat-label">Seat conflicts</div><div class="stat-value mono" id="conflict-2">0</div></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="results" id="results">
+    <h2>Results</h2>
+    <p class="sub" id="results-sub">Total time for every passenger to be seated.</p>
+    <div class="bar-row" id="bar1">
+      <div class="bar-label" style="color:var(--case1-accent)">Window → Middle → Aisle</div>
+      <div class="bar-track"><div class="bar-fill" style="width:0%"><span id="barval-1"></span></div></div>
+    </div>
+    <div class="bar-row" id="bar2">
+      <div class="bar-label" style="color:var(--case2-accent)">Back → Middle → Front</div>
+      <div class="bar-track"><div class="bar-fill" style="width:0%"><span id="barval-2"></span></div></div>
+    </div>
+    <div class="verdict" id="verdict"></div>
+    <p class="note">A seat conflict is counted whenever someone already seated has to stand up so a later passenger can reach a seat further from the aisle. Each simulated tick stands in for about 2 seconds of real boarding time.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  const LETTERS = 'ABCDEFGHJKLMNOPQRSTUVWXYZ'; // aviation convention: skip I
+  const SECONDS_PER_TICK = 2;
+
+  const AIRCRAFT = [
+    { id:'q400',    name:'Bombardier Q400',            tagline:'Regional turboprop',            blocks:[2,2],   rows:19 },
+    { id:'e190',    name:'Embraer E190',                tagline:'Regional jet',                  blocks:[2,2],   rows:25 },
+    { id:'a220',    name:'Airbus A220-300',             tagline:'Narrowbody',                    blocks:[2,3],   rows:27 },
+    { id:'a320',    name:'Airbus A320',                 tagline:'Narrowbody',                    blocks:[3,3],   rows:30 },
+    { id:'737max8', name:'Boeing 737 MAX 8',            tagline:'Narrowbody',                    blocks:[3,3],   rows:32 },
+    { id:'concorde',name:'Concorde',                    tagline:'Retired supersonic · 1976–2003', blocks:[2,2], rows:25 },
+    { id:'787-9',   name:'Boeing 787-9 Dreamliner',     tagline:'Widebody',                      blocks:[3,3,3], rows:32 },
+    { id:'a350-900',name:'Airbus A350-900',             tagline:'Widebody',                      blocks:[3,3,3], rows:33 },
+    { id:'777-300er',name:'Boeing 777-300ER',           tagline:'Widebody',                      blocks:[3,4,3], rows:41 },
+    { id:'a380',    name:'Airbus A380 (main deck)',     tagline:'Widebody · double-decker',      blocks:[3,4,3], rows:48 },
+  ];
+
+  function mulberry32(a){
+    return function(){
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function shuffle(arr, rng){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(rng()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+
+  function targetRowOf(seatId){ return parseInt(seatId,10); }
+
+  // ---------- Aircraft seat-model builder ----------
+  function buildModel(aircraft){
+    const blocks = aircraft.blocks;
+    const numAisles = blocks.length-1;
+    const totalPerRow = blocks.reduce((a,b)=>a+b,0);
+    const totalCols = totalPerRow+numAisles;
+    const rowSeats = [];
+    let li=0, col=0;
+    const aisleColIndex = [];
+    for(let b=0;b<blocks.length;b++){
+      const size = blocks[b];
+      const hasLeft = b>0;
+      const hasRight = b<blocks.length-1;
+      for(let i=0;i<size;i++){
+        const letter = LETTERS[li++];
+        const pathLeft = hasLeft ? i : Infinity;
+        const pathRight = hasRight ? (size-1-i) : Infinity;
+        const aisleSide = pathLeft<=pathRight ? 'left':'right';
+        const aisleIdx = aisleSide==='left' ? b-1 : b;
+        const neighborCount = Math.min(pathLeft,pathRight);
+        const isWindow = (b===0 && i===0) || (b===blocks.length-1 && i===size-1);
+        const isAisleSeat = !isWindow && neighborCount===0;
+        const type = isWindow ? 'window' : (isAisleSeat ? 'aisle':'middle');
+        rowSeats.push({letter, blockIdx:b, idxInBlock:i, aisleIdx, aisleSide, type, colIndex:col});
+        col++;
+      }
+      if(hasRight){ aisleColIndex.push(col); col++; }
+    }
+    for(const s of rowSeats){
+      const blockSeats = rowSeats.filter(x=>x.blockIdx===s.blockIdx);
+      s.neighborLetters = s.aisleSide==='left'
+        ? blockSeats.filter(x=>x.idxInBlock<s.idxInBlock).map(x=>x.letter)
+        : blockSeats.filter(x=>x.idxInBlock>s.idxInBlock).map(x=>x.letter);
+    }
+    return { rows:aircraft.rows, numAisles, totalPerRow, totalCols, rowSeats, aisleColIndex };
+  }
+
+  function allSeats(model){
+    const seats = [];
+    for(let r=1;r<=model.rows;r++){
+      for(const rs of model.rowSeats){
+        seats.push({
+          row:r, col:rs.letter, id:`${r}${rs.letter}`,
+          aisleIdx: rs.aisleIdx, type: rs.type,
+          neighborIds: rs.neighborLetters.map(l=>`${r}${l}`),
+        });
+      }
+    }
+    return seats;
+  }
+
+  function buildSeatMeta(seats, rng){
+    const meta = {};
+    for(const s of seats) meta[s.id] = 4 + Math.floor(rng()*5);
+    return meta;
+  }
+
+  function buildWMA(seats, rng){
+    const groups = [
+      seats.filter(s=>s.type==='window'),
+      seats.filter(s=>s.type==='middle'),
+      seats.filter(s=>s.type==='aisle'),
+    ];
+    const labels = ['Window Seats','Middle Seats','Aisle Seats'];
+    const shuffled = groups.map(g=>shuffle(g,rng));
+    return { order: shuffled.flat().map(s=>s.id), groupSizes: groups.map(g=>g.length), groupLabels: labels };
+  }
+
+  function buildSections(seats, rows, rng){
+    const third = Math.ceil(rows/3);
+    const frontMax = third;
+    const backMin = rows-third+1;
+    const back = seats.filter(s=>s.row>=backMin);
+    const front = seats.filter(s=>s.row<=frontMax);
+    const middle = seats.filter(s=>s.row>frontMax && s.row<backMin);
+    const groups = [back, middle, front];
+    const labels = [
+      `Back Section · Rows ${backMin}–${rows}`,
+      `Middle Section · Rows ${frontMax+1}–${backMin-1}`,
+      `Front Section · Rows 1–${frontMax}`,
+    ];
+    const shuffled = groups.map(g=>shuffle(g,rng));
+    return { order: shuffled.flat().map(s=>s.id), groupSizes: groups.map(g=>g.length), groupLabels: labels };
+  }
+
+  function interference(seatId, seatsIndex, seatedSet){
+    const neighbors = seatsIndex[seatId].neighborIds;
+    const count = neighbors.filter(id=>seatedSet.has(id)).length;
+    return { penalty: count*2, count };
+  }
+
+  function createSim(built, seatsIndex, numAisles, rows){
+    return {
+      order: built.order, groupSizes: built.groupSizes, groupLabels: built.groupLabels,
+      passengers: built.order.map(id=>({id, aisleIdx:seatsIndex[id].aisleIdx, pos:-1, stowRemaining:0, seated:false})),
+      occupiedRow: Array.from({length:numAisles}, ()=> new Array(rows+1).fill(null)),
+      seatedSet: new Set(), queueIndex:0, tick:0, seatedCount:0, interferenceCount:0, finished:false,
+    };
+  }
+
+  function startStow(state, idx, seatsIndex, seatMeta){
+    const p = state.passengers[idx];
+    const {penalty, count} = interference(p.id, seatsIndex, state.seatedSet);
+    p.stowRemaining = seatMeta[p.id] + penalty;
+    if(count>0) state.interferenceCount += count;
+  }
+
+  function step(state, seatsIndex, seatMeta){
+    if(state.finished) return;
+    const active = [];
+    for(let i=0;i<state.passengers.length;i++){
+      const p = state.passengers[i];
+      if(p.pos>=1 && !p.seated) active.push(i);
+    }
+    active.sort((a,b)=> state.passengers[b].pos - state.passengers[a].pos);
+
+    for(const i of active){
+      const p = state.passengers[i];
+      const lane = state.occupiedRow[p.aisleIdx];
+      if(p.stowRemaining>0){
+        p.stowRemaining--;
+        if(p.stowRemaining===0){
+          p.seated = true; lane[p.pos] = null;
+          state.seatedSet.add(p.id); state.seatedCount++;
+        }
+        continue;
+      }
+      const target = targetRowOf(p.id);
+      if(p.pos===target){ startStow(state,i,seatsIndex,seatMeta); continue; }
+      const next = p.pos+1;
+      if(lane[next]==null){
+        lane[p.pos] = null; p.pos = next; lane[next] = i;
+        if(p.pos===target) startStow(state,i,seatsIndex,seatMeta);
+      }
+    }
+
+    if(state.queueIndex < state.order.length){
+      const i = state.queueIndex;
+      const p = state.passengers[i];
+      const lane = state.occupiedRow[p.aisleIdx];
+      if(lane[1]==null){
+        p.pos = 1; lane[1] = i; state.queueIndex++;
+        if(targetRowOf(p.id)===1) startStow(state,i,seatsIndex,seatMeta);
+      }
+    }
+
+    state.tick++;
+    if(state.seatedCount === state.order.length) state.finished = true;
+  }
+
+  // ---------- DOM build ----------
+  function buildGrid(gridEl, model){
+    gridEl.innerHTML = '<div class="token-layer"></div>';
+    gridEl.style.gridTemplateColumns = `repeat(${model.totalCols}, var(--cell))`;
+    const isAisleCol = new Set(model.aisleColIndex);
+    const byCol = {};
+    model.rowSeats.forEach(rs=>{ byCol[rs.colIndex] = rs; });
+    const frag = document.createDocumentFragment();
+    for(let c=0;c<model.totalCols;c++){
+      const label = document.createElement('div');
+      label.className = 'col-label';
+      label.textContent = isAisleCol.has(c) ? '' : byCol[c].letter;
+      frag.appendChild(label);
+    }
+    for(let r=1;r<=model.rows;r++){
+      for(let c=0;c<model.totalCols;c++){
+        if(isAisleCol.has(c)){
+          const gap = document.createElement('div');
+          gap.className = 'aisle-cell';
+          frag.appendChild(gap);
+        } else {
+          const rs = byCol[c];
+          const cell = document.createElement('div');
+          cell.className = 'seat' + (Math.floor((r-1)/5)%2===1 ? ' band' : '');
+          cell.dataset.seat = `${r}${rs.letter}`;
+          frag.appendChild(cell);
+        }
+      }
+    }
+    gridEl.appendChild(frag);
+  }
+
+  function fmtTime(ticks){
+    const s = ticks*SECONDS_PER_TICK;
+    const m = Math.floor(s/60);
+    const sec = Math.round(s%60);
+    return `${m}:${sec.toString().padStart(2,'0')}`;
+  }
+
+  function renderPhases(container, labels){
+    container.innerHTML = '';
+    labels.forEach((label,i)=>{
+      const chip = document.createElement('span');
+      chip.className = 'phase-chip';
+      chip.textContent = `${i+1}. ${label}`;
+      container.appendChild(chip);
+    });
+  }
+
+  function boundariesFrom(sizes){
+    const b = []; let acc=0;
+    for(const s of sizes){ acc+=s; b.push(acc); }
+    return b;
+  }
+
+  function currentPhase(state, boundaries){
+    for(let i=0;i<boundaries.length;i++){
+      if(state.queueIndex < boundaries[i] || (state.queueIndex===boundaries[i] && state.seatedCount<boundaries[i])) return i;
+    }
+    return boundaries.length-1;
+  }
+
+  function render(caseNum, state, boundaries, model){
+    const gridEl = document.getElementById(`grid-${caseNum}`);
+    const tokensLayer = gridEl.querySelector('.token-layer');
+
+    for(const p of state.passengers){
+      if(p.seated){
+        const cell = gridEl.querySelector(`[data-seat="${p.id}"]`);
+        if(cell && !cell.classList.contains('seated')) cell.classList.add('seated');
+      }
+    }
+
+    const activeIds = new Set();
+    for(const p of state.passengers){
+      if(p.pos>=1 && !p.seated){
+        activeIds.add(p.id);
+        let tok = tokensLayer.querySelector(`[data-tok="${p.id}"]`);
+        if(!tok){
+          tok = document.createElement('div');
+          tok.className = 'token';
+          tok.dataset.tok = p.id;
+          tok.style.setProperty('--acol', model.aisleColIndex[p.aisleIdx]);
+          tok.innerHTML = '<div class="dot"></div>';
+          tokensLayer.appendChild(tok);
+        }
+        tok.style.setProperty('--arow', p.pos);
+        tok.classList.toggle('stowing', p.stowRemaining>0);
+      }
+    }
+    tokensLayer.querySelectorAll('.token').forEach(tok=>{
+      if(!activeIds.has(tok.dataset.tok)) tok.remove();
+    });
+
+    document.getElementById(`seated-${caseNum}`).textContent = state.seatedCount;
+    document.getElementById(`time-${caseNum}`).textContent = fmtTime(state.tick);
+    document.getElementById(`conflict-${caseNum}`).textContent = state.interferenceCount;
+    document.getElementById(`progress-${caseNum}`).style.width = `${state.seatedCount/state.order.length*100}%`;
+
+    const phase = currentPhase(state, boundaries);
+    const phasesEl = document.getElementById(`phases-${caseNum}`);
+    phasesEl.querySelectorAll('.phase-chip').forEach((chip,i)=>{
+      chip.classList.toggle('active', i===phase && !state.finished);
+      chip.classList.toggle('done', i<phase || state.finished);
+    });
+    const nowEl = document.getElementById(`now-${caseNum}`);
+    nowEl.innerHTML = state.finished
+      ? `<span class="flash">All ${state.order.length} passengers seated.</span>`
+      : `Now boarding: <span class="flash">${state.groupLabels[phase]}</span>`;
+  }
+
+  // ---------- orchestration ----------
+  let seed = Math.floor(Math.random()*1e9);
+  let sim1, sim2, bounds1, bounds2, model, seatsIndex, seatMetaShared, currentAircraft;
+  let playing = true, timer = null, speedMult = 2;
+  const BASE_DELAY = 260;
+
+  const select = document.getElementById('aircraft');
+  AIRCRAFT.forEach(a=>{
+    const opt = document.createElement('option');
+    opt.value = a.id;
+    const seats = a.rows * a.blocks.reduce((x,y)=>x+y,0);
+    const aisleLabel = a.blocks.length===2 ? 'single aisle' : 'twin aisle';
+    opt.textContent = `${a.name} — ${seats} seats, ${aisleLabel} (${a.tagline})`;
+    select.appendChild(opt);
+  });
+  select.value = 'a320';
+
+  function layoutString(blocks){ return blocks.join('-'); }
+
+  function setup(){
+    currentAircraft = AIRCRAFT.find(a=>a.id===select.value);
+    model = buildModel(currentAircraft);
+    const seats = allSeats(model);
+    seatsIndex = {}; seats.forEach(s=>{ seatsIndex[s.id]=s; });
+
+    const rngMeta = mulberry32(seed);
+    seatMetaShared = buildSeatMeta(seats, rngMeta);
+    const rng1 = mulberry32(seed+1);
+    const rng2 = mulberry32(seed+2);
+    const built1 = buildWMA(seats, rng1);
+    const built2 = buildSections(seats, model.rows, rng2);
+    sim1 = createSim(built1, seatsIndex, model.numAisles, model.rows);
+    sim2 = createSim(built2, seatsIndex, model.numAisles, model.rows);
+    bounds1 = boundariesFrom(sim1.groupSizes);
+    bounds2 = boundariesFrom(sim2.groupSizes);
+
+    buildGrid(document.getElementById('grid-1'), model);
+    buildGrid(document.getElementById('grid-2'), model);
+    renderPhases(document.getElementById('phases-1'), sim1.groupLabels);
+    renderPhases(document.getElementById('phases-2'), sim2.groupLabels);
+    document.getElementById('results').classList.remove('show');
+
+    const total = seats.length;
+    document.getElementById('total-1').textContent = total;
+    document.getElementById('total-2').textContent = total;
+    document.getElementById('results-sub').textContent = `Total time for every one of the ${total} passengers to be seated.`;
+    document.getElementById('ticket-config').innerHTML = `${layoutString(currentAircraft.blocks)} &middot; ${model.rows} ROWS &middot; ${total} SEATS`;
+    document.getElementById('ticket-flight').innerHTML = `${currentAircraft.name.toUpperCase()}`;
+
+    render(1, sim1, bounds1, model);
+    render(2, sim2, bounds2, model);
+  }
+
+  function tick(){
+    if(!sim1.finished) step(sim1, seatsIndex, seatMetaShared);
+    if(!sim2.finished) step(sim2, seatsIndex, seatMetaShared);
+    render(1, sim1, bounds1, model);
+    render(2, sim2, bounds2, model);
+    if(sim1.finished && sim2.finished){
+      showResults();
+      stopTimer();
+      setPlayLabel(false);
+    }
+  }
+
+  function showResults(){
+    const t1 = sim1.tick, t2 = sim2.tick;
+    const max = Math.max(t1,t2);
+    const el = document.getElementById('results');
+    document.getElementById('barval-1').textContent = fmtTime(t1);
+    document.getElementById('barval-2').textContent = fmtTime(t2);
+    requestAnimationFrame(()=>{
+      document.querySelector('#bar1 .bar-fill').style.width = `${t1/max*100}%`;
+      document.querySelector('#bar2 .bar-fill').style.width = `${t2/max*100}%`;
+    });
+    const faster = t1<=t2
+      ? {name:'Window → Middle → Aisle', slow:'Back → Middle → Front', ft:t1, st:t2, conflicts:sim2.interferenceCount}
+      : {name:'Back → Middle → Front', slow:'Window → Middle → Aisle', ft:t2, st:t1, conflicts:sim1.interferenceCount};
+    const pct = Math.round((faster.st-faster.ft)/faster.st*100);
+    document.getElementById('verdict').innerHTML =
+      `<b>${faster.name}</b> finished in ${fmtTime(faster.ft)}, ${pct}% faster than <b>${faster.slow}</b> at ${fmtTime(faster.st)} &mdash; ` +
+      `which racked up ${faster.conflicts} seat conflict${faster.conflicts===1?'':'s'} along the way.`;
+    el.classList.add('show');
+  }
+
+  function startTimer(){ stopTimer(); timer = setInterval(tick, BASE_DELAY/speedMult); }
+  function stopTimer(){ if(timer){ clearInterval(timer); timer=null; } }
+  function setPlayLabel(isPlaying){ document.getElementById('playBtn').textContent = isPlaying ? 'Pause' : 'Play'; }
+
+  document.getElementById('playBtn').addEventListener('click', ()=>{
+    if(sim1.finished && sim2.finished) return;
+    playing = !playing;
+    setPlayLabel(playing);
+    if(playing) startTimer(); else stopTimer();
+  });
+
+  document.getElementById('reshuffleBtn').addEventListener('click', ()=>{
+    seed = Math.floor(Math.random()*1e9);
+    stopTimer(); setup();
+    playing = true; setPlayLabel(true); startTimer();
+  });
+
+  select.addEventListener('change', ()=>{
+    seed = Math.floor(Math.random()*1e9);
+    stopTimer(); setup();
+    playing = true; setPlayLabel(true); startTimer();
+  });
+
+  document.getElementById('speed').addEventListener('input', (e)=>{
+    speedMult = Number(e.target.value);
+    document.getElementById('speedVal').textContent = `${speedMult}×`;
+    if(playing) startTimer();
+  });
+
+  (function barcode(){
+    const el = document.querySelector('.barcode');
+    const widths = [2,1,3,1,1,2,4,1,2,1,3,2,1,1,2,3,1,4,1,2];
+    widths.forEach(w=>{
+      const bar = document.createElement('i');
+      bar.style.width = w+'px';
+      bar.style.height = (10+w*3)+'%';
+      el.appendChild(bar);
+    });
+  })();
+
+  setup();
+  startTimer();
+
+  if (window.claude?.hot) {
+    window.claude.hot.ready(function start(){});
+  }
+})();
+</script>
