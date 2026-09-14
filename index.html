@@ -9,10 +9,6 @@
     --paper-050:#eef0f3;
     --paper-100:#ffffff;
     --paper-300:#d7dbe2;
-    --amber-500:#e8960a;
-    --amber-600:#c97e06;
-    --teal-600:#128585;
-    --teal-500:#1aa6a6;
 
     --bg: var(--paper-050);
     --surface: var(--paper-100);
@@ -23,10 +19,16 @@
     --border: var(--paper-300);
     --seat-empty: var(--paper-300);
     --seat-empty-border: #c2c7d1;
-    --case1-accent: var(--amber-600);
-    --case2-accent: var(--teal-600);
     --track-bg: #e3e6ec;
     --shadow: 0 1px 2px rgba(18,23,42,0.06), 0 8px 24px -12px rgba(18,23,42,0.18);
+
+    --c1: #c97e06;
+    --c1-ink: #1a1200;
+    --c2: #128585;
+    --c2-ink: #001c1c;
+    --c3: #7a5ac9;
+    --c3-ink: #17102e;
+
     --cell: 16px;
     --gap: 2px;
     --rowh: calc(var(--cell) * 1.3);
@@ -41,7 +43,10 @@
       --bg:#0d111f; --surface:#171d31; --surface-sunken:#12172a;
       --text-primary:#eef0f5; --text-secondary:#aab0c4; --text-muted:#7c839c;
       --border:#2a3150; --seat-empty:#232b48; --seat-empty-border:#333c60;
-      --case1-accent:#f5ab2e; --case2-accent:#2bc4c4; --track-bg:#1e2540;
+      --track-bg:#1e2540;
+      --c1:#f5ab2e; --c1-ink:#1a1200;
+      --c2:#2bc4c4; --c2-ink:#001c1c;
+      --c3:#b79cea; --c3-ink:#17102e;
       --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 12px 28px -14px rgba(0,0,0,0.6);
     }
   }
@@ -49,7 +54,10 @@
     --bg:#0d111f; --surface:#171d31; --surface-sunken:#12172a;
     --text-primary:#eef0f5; --text-secondary:#aab0c4; --text-muted:#7c839c;
     --border:#2a3150; --seat-empty:#232b48; --seat-empty-border:#333c60;
-    --case1-accent:#f5ab2e; --case2-accent:#2bc4c4; --track-bg:#1e2540;
+    --track-bg:#1e2540;
+    --c1:#f5ab2e; --c1-ink:#1a1200;
+    --c2:#2bc4c4; --c2-ink:#001c1c;
+    --c3:#b79cea; --c3-ink:#17102e;
     --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 12px 28px -14px rgba(0,0,0,0.6);
   }
 
@@ -59,7 +67,7 @@
     font-family:'Overpass',system-ui,-apple-system,'Segoe UI',sans-serif;
     padding-inline:20px; padding-block:28px 48px;
   }
-  .wrap{max-width:980px;margin:0 auto;}
+  .wrap{max-width:1180px;margin:0 auto;}
   .mono{font-family:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;}
 
   .masthead{
@@ -88,7 +96,7 @@
     border:1px solid var(--text-primary); border-radius:7px; background:var(--surface);
     color:var(--text-primary); padding:8px 10px; max-width:340px;
   }
-  select.mono:focus-visible{outline:3px solid var(--case2-accent); outline-offset:2px;}
+  select.mono:focus-visible{outline:3px solid var(--c2); outline-offset:2px;}
   .btn{
     font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600; letter-spacing:.03em;
     text-transform:uppercase; border:1px solid var(--text-primary);
@@ -99,33 +107,81 @@
   .btn:hover{opacity:.85;}
   .btn:active{transform:scale(0.97);}
   .btn.ghost{background:transparent;color:var(--text-primary);}
-  .btn:focus-visible{outline:3px solid var(--case2-accent); outline-offset:2px;}
+  .btn:focus-visible{outline:3px solid var(--c2); outline-offset:2px;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
   .speed-group{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-secondary);}
   .speed-group input[type=range]{accent-color:var(--text-primary); width:110px;}
   .speed-val{font-family:'IBM Plex Mono',monospace;min-width:34px;display:inline-block;}
 
-  .planes{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
-  @media (max-width:720px){ .planes{grid-template-columns:1fr;} }
+  .layout{display:grid; grid-template-columns:230px 1fr; gap:20px; align-items:start;}
+  @media (max-width:780px){ .layout{grid-template-columns:1fr;} }
+
+  .sidebar{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    box-shadow:var(--shadow); padding:16px; position:sticky; top:16px;
+  }
+  @media (max-width:780px){ .sidebar{position:static;} }
+  .sidebar-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .sidebar h2{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);font-weight:700;}
+  .case-actions{display:flex;gap:10px;}
+  .linklike{
+    background:none;border:none;padding:0;font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+    color:var(--text-secondary);text-decoration:underline;text-underline-offset:2px;cursor:pointer;
+  }
+  .linklike:hover{color:var(--text-primary);}
+  .case-list{display:flex;flex-direction:column;gap:8px;}
+  .case-item{
+    display:flex; align-items:flex-start; gap:9px; padding:10px; border-radius:10px;
+    border:1px solid var(--border); background:var(--surface-sunken); cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .case-item.is-checked{background:var(--surface); border-color:var(--accent);}
+  .case-item[data-accent="c1"]{--accent:var(--c1);}
+  .case-item[data-accent="c2"]{--accent:var(--c2);}
+  .case-item[data-accent="c3"]{--accent:var(--c3);}
+  .case-item input{margin:3px 0 0; accent-color:var(--accent); flex-shrink:0;}
+  .case-swatch{width:9px;height:9px;border-radius:50%;background:var(--accent);margin-top:5px;flex-shrink:0;}
+  .case-text{font-size:12.5px;line-height:1.4;}
+  .case-text b{display:block;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:2px;}
+
+  .empty-state{
+    background:var(--surface); border:1px dashed var(--border); border-radius:14px;
+    padding:40px 24px; text-align:center; color:var(--text-secondary); font-size:14px;
+  }
+
+  .planes{display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:20px;}
 
   .panel{
     background:var(--surface); border:1px solid var(--border); border-radius:14px;
     box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column;
   }
-  .panel-head{padding:16px 18px 12px;}
-  .panel[data-case="1"] .case-name{color:var(--case1-accent);}
-  .panel[data-case="2"] .case-name{color:var(--case2-accent);}
-  .case-eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600;}
-  .case-name{font-size:19px;font-weight:700;margin:2px 0 10px;}
+  .panel[data-accent="c1"] .case-name{color:var(--c1);}
+  .panel[data-accent="c2"] .case-name{color:var(--c2);}
+  .panel[data-accent="c3"] .case-name{color:var(--c3);}
+  .panel[data-accent="c1"] .seat.seated{background:var(--c1); border-color:var(--c1);}
+  .panel[data-accent="c2"] .seat.seated{background:var(--c2); border-color:var(--c2);}
+  .panel[data-accent="c3"] .seat.seated{background:var(--c3); border-color:var(--c3);}
+  .panel[data-accent="c1"] .token .dot{background:var(--c1);}
+  .panel[data-accent="c2"] .token .dot{background:var(--c2);}
+  .panel[data-accent="c3"] .token .dot{background:var(--c3);}
+  .panel[data-accent="c1"] .progress-fill{background:var(--c1);}
+  .panel[data-accent="c2"] .progress-fill{background:var(--c2);}
+  .panel[data-accent="c3"] .progress-fill{background:var(--c3);}
+  .panel[data-accent="c1"] .phase-chip.active{background:var(--c1);border-color:var(--c1);color:var(--c1-ink);}
+  .panel[data-accent="c2"] .phase-chip.active{background:var(--c2);border-color:var(--c2);color:var(--c2-ink);}
+  .panel[data-accent="c3"] .phase-chip.active{background:var(--c3);border-color:var(--c3);color:var(--c3-ink);}
 
-  .phases{display:flex;gap:6px;flex-wrap:wrap;align-content:flex-start;min-height:54px;margin-bottom:12px;}
+  .panel-head{padding:16px 18px 12px;}
+  .case-eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600;}
+  .case-name{font-size:18px;font-weight:700;margin:2px 0 10px;text-wrap:balance;}
+
+  .phases{display:flex;gap:6px;flex-wrap:wrap;align-content:flex-start;min-height:76px;margin-bottom:12px;}
   .phase-chip{
-    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.02em;
+    font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.02em;
     border:1px solid var(--border); color:var(--text-muted);
     padding:4px 8px; border-radius:999px; background:var(--surface-sunken);
     transition:background .2s, color .2s, border-color .2s;
   }
-  .panel[data-case="1"] .phase-chip.active{background:var(--case1-accent);border-color:var(--case1-accent);color:#1a1200;}
-  .panel[data-case="2"] .phase-chip.active{background:var(--case2-accent);border-color:var(--case2-accent);color:#001c1c;}
   .phase-chip.done{color:var(--text-secondary);}
 
   .now-boarding{
@@ -146,8 +202,6 @@
   .seat{background:var(--seat-empty); border:1px solid var(--seat-empty-border); border-radius:2px; transition:background .35s ease, border-color .35s ease;}
   .seat.band{filter:brightness(0.985);}
   .aisle-cell{background:transparent;}
-  .panel[data-case="1"] .seat.seated{background:var(--case1-accent); border-color:var(--case1-accent);}
-  .panel[data-case="2"] .seat.seated{background:var(--case2-accent); border-color:var(--case2-accent);}
 
   .token-layer{position:absolute; inset:0; pointer-events:none;}
   .token{
@@ -159,8 +213,6 @@
     transition:top .28s linear;
   }
   .token .dot{width:62%; aspect-ratio:1/1; border-radius:50%; box-shadow:0 0 0 2px var(--surface);}
-  .panel[data-case="1"] .token .dot{background:var(--case1-accent);}
-  .panel[data-case="2"] .token .dot{background:var(--case2-accent);}
   .token.stowing .dot{animation:pulse 0.9s ease-in-out infinite;}
   @keyframes pulse{
     0%,100%{box-shadow:0 0 0 2px var(--surface);}
@@ -176,15 +228,13 @@
   .stat{padding:0 10px; border-left:1px solid var(--border);}
   .stat:first-child{border-left:none;padding-left:0;}
   .stat-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);}
-  .stat-value{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:2px;}
+  .stat-value{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:2px;}
 
   .progress-track{height:6px;border-radius:4px;background:var(--track-bg);overflow:hidden;margin:16px 18px;}
   .progress-fill{height:100%;width:0%;border-radius:4px;transition:width .25s linear;}
-  .panel[data-case="1"] .progress-fill{background:var(--case1-accent);}
-  .panel[data-case="2"] .progress-fill{background:var(--case2-accent);}
 
   .results{
-    margin-top:26px; background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    margin-top:22px; background:var(--surface); border:1px solid var(--border); border-radius:14px;
     box-shadow:var(--shadow); padding:22px 24px; opacity:0; transform:translateY(8px);
     transition:opacity .4s ease, transform .4s ease; pointer-events:none;
   }
@@ -192,12 +242,10 @@
   .results h2{margin:0 0 4px;font-size:20px;font-weight:700;}
   .results .sub{color:var(--text-secondary);font-size:13px;margin:0 0 18px;}
   .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
-  .bar-label{width:190px;flex-shrink:0;font-size:13px;font-weight:600;}
+  .bar-label{width:220px;flex-shrink:0;font-size:13px;font-weight:600;}
   .bar-track{flex:1;background:var(--track-bg);border-radius:6px;height:28px;position:relative;overflow:hidden;}
-  .bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;transition:width 1s cubic-bezier(.2,.8,.2,1);}
+  .bar-fill{height:100%;width:0%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;transition:width 1s cubic-bezier(.2,.8,.2,1);}
   .bar-fill span{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--surface);white-space:nowrap;}
-  #bar1 .bar-fill{background:var(--case1-accent);}
-  #bar2 .bar-fill{background:var(--case2-accent);}
   .verdict{margin-top:16px; padding-top:16px; border-top:1px solid var(--border); font-size:15px; line-height:1.55; text-wrap:balance;}
   .verdict b{color:var(--text-primary);}
   .note{margin-top:10px;font-size:12.5px;color:var(--text-muted);line-height:1.5;}
@@ -214,7 +262,7 @@
   <div class="masthead">
     <div>
       <h1>Boarding Call</h1>
-      <p class="tagline">Two boarding orders race down the same plane, seat by seat, so you can see exactly where the minutes go.</p>
+      <p class="tagline">Pick any boarding orders from the left and race them down the same plane, seat by seat.</p>
     </div>
     <div class="ticket-strip">
       <div>AIRCRAFT<br><b id="ticket-config">&nbsp;</b></div>
@@ -237,63 +285,30 @@
     </div>
   </div>
 
-  <div class="planes">
-    <section class="panel" data-case="1">
-      <div class="panel-head">
-        <div class="case-eyebrow">Case 1</div>
-        <h2 class="case-name">Window &rarr; Middle &rarr; Aisle</h2>
-        <div class="phases" id="phases-1"></div>
-        <div class="now-boarding" id="now-1"></div>
-      </div>
-      <div class="plane-shell">
-        <div class="plane-grid" id="grid-1">
-          <div class="token-layer" id="tokens-1"></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-head">
+        <h2>Boarding Orders</h2>
+        <div class="case-actions">
+          <button class="linklike" id="selAll">All</button>
+          <button class="linklike" id="selNone">None</button>
         </div>
       </div>
-      <hr class="perforation">
-      <div class="progress-track"><div class="progress-fill" id="progress-1"></div></div>
-      <div class="stats">
-        <div class="stat"><div class="stat-label">Seated</div><div class="stat-value mono"><span id="seated-1">0</span>/<span id="total-1">0</span></div></div>
-        <div class="stat"><div class="stat-label">Elapsed</div><div class="stat-value mono" id="time-1">0:00</div></div>
-        <div class="stat"><div class="stat-label">Seat conflicts</div><div class="stat-value mono" id="conflict-1">0</div></div>
-      </div>
-    </section>
+      <div class="case-list" id="caseList"></div>
+    </aside>
 
-    <section class="panel" data-case="2">
-      <div class="panel-head">
-        <div class="case-eyebrow">Case 2</div>
-        <h2 class="case-name">Back &rarr; Middle &rarr; Front</h2>
-        <div class="phases" id="phases-2"></div>
-        <div class="now-boarding" id="now-2"></div>
-      </div>
-      <div class="plane-shell">
-        <div class="plane-grid" id="grid-2">
-          <div class="token-layer" id="tokens-2"></div>
-        </div>
-      </div>
-      <hr class="perforation">
-      <div class="progress-track"><div class="progress-fill" id="progress-2"></div></div>
-      <div class="stats">
-        <div class="stat"><div class="stat-label">Seated</div><div class="stat-value mono"><span id="seated-2">0</span>/<span id="total-2">0</span></div></div>
-        <div class="stat"><div class="stat-label">Elapsed</div><div class="stat-value mono" id="time-2">0:00</div></div>
-        <div class="stat"><div class="stat-label">Seat conflicts</div><div class="stat-value mono" id="conflict-2">0</div></div>
-      </div>
-    </section>
-  </div>
+    <div class="main">
+      <div class="planes" id="planes"></div>
+      <div class="empty-state" id="emptyState" hidden>Select at least one boarding order from the left to start the race.</div>
 
-  <div class="results" id="results">
-    <h2>Results</h2>
-    <p class="sub" id="results-sub">Total time for every passenger to be seated.</p>
-    <div class="bar-row" id="bar1">
-      <div class="bar-label" style="color:var(--case1-accent)">Window → Middle → Aisle</div>
-      <div class="bar-track"><div class="bar-fill" style="width:0%"><span id="barval-1"></span></div></div>
+      <div class="results" id="results">
+        <h2>Results</h2>
+        <p class="sub" id="results-sub">Total time for every passenger to be seated.</p>
+        <div id="barRows"></div>
+        <div class="verdict" id="verdict"></div>
+        <p class="note">A seat conflict is counted whenever someone already seated has to stand up so a later passenger can reach a seat further from the aisle. Each simulated tick stands in for about 2 seconds of real boarding time.</p>
+      </div>
     </div>
-    <div class="bar-row" id="bar2">
-      <div class="bar-label" style="color:var(--case2-accent)">Back → Middle → Front</div>
-      <div class="bar-track"><div class="bar-fill" style="width:0%"><span id="barval-2"></span></div></div>
-    </div>
-    <div class="verdict" id="verdict"></div>
-    <p class="note">A seat conflict is counted whenever someone already seated has to stand up so a later passenger can reach a seat further from the aisle. Each simulated tick stands in for about 2 seconds of real boarding time.</p>
   </div>
 </div>
 
@@ -313,6 +328,12 @@
     { id:'a350-900',name:'Airbus A350-900',             tagline:'Widebody',                      blocks:[3,3,3], rows:33 },
     { id:'777-300er',name:'Boeing 777-300ER',           tagline:'Widebody',                      blocks:[3,4,3], rows:41 },
     { id:'a380',    name:'Airbus A380 (main deck)',     tagline:'Widebody · double-decker',      blocks:[3,4,3], rows:48 },
+  ];
+
+  const STRATEGIES = [
+    { num:1, id:'wma', label:'Window → Middle → Aisle', accent:'c1' },
+    { num:2, id:'z3',  label:'Back → Middle → Front', accent:'c2', zones:3 },
+    { num:3, id:'z5',  label:'Back → Middle-Back → Middle → Middle-Front → Front', accent:'c3', zones:5 },
   ];
 
   function mulberry32(a){
@@ -392,6 +413,7 @@
     return meta;
   }
 
+  // ---------- Boarding-order builders ----------
   function buildWMA(seats, rng){
     const groups = [
       seats.filter(s=>s.type==='window'),
@@ -403,21 +425,24 @@
     return { order: shuffled.flat().map(s=>s.id), groupSizes: groups.map(g=>g.length), groupLabels: labels };
   }
 
-  function buildSections(seats, rows, rng){
-    const third = Math.ceil(rows/3);
-    const frontMax = third;
-    const backMin = rows-third+1;
-    const back = seats.filter(s=>s.row>=backMin);
-    const front = seats.filter(s=>s.row<=frontMax);
-    const middle = seats.filter(s=>s.row>frontMax && s.row<backMin);
-    const groups = [back, middle, front];
-    const labels = [
-      `Back Section · Rows ${backMin}–${rows}`,
-      `Middle Section · Rows ${frontMax+1}–${backMin-1}`,
-      `Front Section · Rows 1–${frontMax}`,
-    ];
+  const ZONE_NAMES = { 3:['Front','Middle','Back'], 5:['Front','Middle-Front','Middle','Middle-Back','Back'] };
+
+  function buildZones(seats, rows, n, rng){
+    const bounds = [];
+    for(let i=0;i<n;i++) bounds.push(Math.round((i+1)*rows/n));
+    const namesFrontToBack = ZONE_NAMES[n] || Array.from({length:n}, (_,i)=>`Zone ${i+1}`);
+    const zonesFrontToBack = [];
+    let prev = 0;
+    for(let i=0;i<n;i++){ zonesFrontToBack.push({start:prev+1, end:bounds[i], name:namesFrontToBack[i]}); prev = bounds[i]; }
+    const zonesBackToFront = zonesFrontToBack.slice().reverse();
+    const groups = zonesBackToFront.map(z=> seats.filter(s=>s.row>=z.start && s.row<=z.end));
+    const labels = zonesBackToFront.map(z=> `${z.name} Section · Rows ${z.start}–${z.end}`);
     const shuffled = groups.map(g=>shuffle(g,rng));
     return { order: shuffled.flat().map(s=>s.id), groupSizes: groups.map(g=>g.length), groupLabels: labels };
+  }
+
+  function buildForStrategy(strategy, seats, rows, rng){
+    return strategy.id==='wma' ? buildWMA(seats, rng) : buildZones(seats, rows, strategy.zones, rng);
   }
 
   function interference(seatId, seatsIndex, seatedSet){
@@ -517,6 +542,37 @@
     gridEl.appendChild(frag);
   }
 
+  function createPanelDOM(strategy, totalSeats){
+    const root = document.createElement('section');
+    root.className = 'panel';
+    root.dataset.accent = strategy.accent;
+    root.innerHTML = `
+      <div class="panel-head">
+        <div class="case-eyebrow">Case ${strategy.num}</div>
+        <h2 class="case-name">${strategy.label}</h2>
+        <div class="phases"></div>
+        <div class="now-boarding"></div>
+      </div>
+      <div class="plane-shell"><div class="plane-grid"></div></div>
+      <hr class="perforation">
+      <div class="progress-track"><div class="progress-fill"></div></div>
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Seated</div><div class="stat-value mono"><span class="seated">0</span>/<span class="total">${totalSeats}</span></div></div>
+        <div class="stat"><div class="stat-label">Elapsed</div><div class="stat-value mono time">0:00</div></div>
+        <div class="stat"><div class="stat-label">Seat conflicts</div><div class="stat-value mono conflict">0</div></div>
+      </div>`;
+    return {
+      root,
+      gridEl: root.querySelector('.plane-grid'),
+      phasesEl: root.querySelector('.phases'),
+      nowEl: root.querySelector('.now-boarding'),
+      seatedEl: root.querySelector('.seated'),
+      timeEl: root.querySelector('.time'),
+      conflictEl: root.querySelector('.conflict'),
+      progressEl: root.querySelector('.progress-fill'),
+    };
+  }
+
   function fmtTime(ticks){
     const s = ticks*SECONDS_PER_TICK;
     const m = Math.floor(s/60);
@@ -547,19 +603,19 @@
     return boundaries.length-1;
   }
 
-  function render(caseNum, state, boundaries, model){
-    const gridEl = document.getElementById(`grid-${caseNum}`);
-    const tokensLayer = gridEl.querySelector('.token-layer');
+  function render(runner, model){
+    const { sim, bounds, dom } = runner;
+    const tokensLayer = dom.gridEl.querySelector('.token-layer');
 
-    for(const p of state.passengers){
+    for(const p of sim.passengers){
       if(p.seated){
-        const cell = gridEl.querySelector(`[data-seat="${p.id}"]`);
+        const cell = dom.gridEl.querySelector(`[data-seat="${p.id}"]`);
         if(cell && !cell.classList.contains('seated')) cell.classList.add('seated');
       }
     }
 
     const activeIds = new Set();
-    for(const p of state.passengers){
+    for(const p of sim.passengers){
       if(p.pos>=1 && !p.seated){
         activeIds.add(p.id);
         let tok = tokensLayer.querySelector(`[data-tok="${p.id}"]`);
@@ -579,28 +635,28 @@
       if(!activeIds.has(tok.dataset.tok)) tok.remove();
     });
 
-    document.getElementById(`seated-${caseNum}`).textContent = state.seatedCount;
-    document.getElementById(`time-${caseNum}`).textContent = fmtTime(state.tick);
-    document.getElementById(`conflict-${caseNum}`).textContent = state.interferenceCount;
-    document.getElementById(`progress-${caseNum}`).style.width = `${state.seatedCount/state.order.length*100}%`;
+    dom.seatedEl.textContent = sim.seatedCount;
+    dom.timeEl.textContent = fmtTime(sim.tick);
+    dom.conflictEl.textContent = sim.interferenceCount;
+    dom.progressEl.style.width = `${sim.seatedCount/sim.order.length*100}%`;
 
-    const phase = currentPhase(state, boundaries);
-    const phasesEl = document.getElementById(`phases-${caseNum}`);
-    phasesEl.querySelectorAll('.phase-chip').forEach((chip,i)=>{
-      chip.classList.toggle('active', i===phase && !state.finished);
-      chip.classList.toggle('done', i<phase || state.finished);
+    const phase = currentPhase(sim, bounds);
+    dom.phasesEl.querySelectorAll('.phase-chip').forEach((chip,i)=>{
+      chip.classList.toggle('active', i===phase && !sim.finished);
+      chip.classList.toggle('done', i<phase || sim.finished);
     });
-    const nowEl = document.getElementById(`now-${caseNum}`);
-    nowEl.innerHTML = state.finished
-      ? `<span class="flash">All ${state.order.length} passengers seated.</span>`
-      : `Now boarding: <span class="flash">${state.groupLabels[phase]}</span>`;
+    dom.nowEl.innerHTML = sim.finished
+      ? `<span class="flash">All ${sim.order.length} passengers seated.</span>`
+      : `Now boarding: <span class="flash">${sim.groupLabels[phase]}</span>`;
   }
 
   // ---------- orchestration ----------
   let seed = Math.floor(Math.random()*1e9);
-  let sim1, sim2, bounds1, bounds2, model, seatsIndex, seatMetaShared, currentAircraft;
+  let model, seatsIndex, seatMetaShared, currentAircraft;
+  let runners = [];
   let playing = true, timer = null, speedMult = 2;
   const BASE_DELAY = 260;
+  const selected = new Set(STRATEGIES.map(s=>s.num));
 
   const select = document.getElementById('aircraft');
   AIRCRAFT.forEach(a=>{
@@ -615,6 +671,35 @@
 
   function layoutString(blocks){ return blocks.join('-'); }
 
+  function renderSidebar(){
+    const list = document.getElementById('caseList');
+    list.innerHTML = '';
+    STRATEGIES.forEach(s=>{
+      const item = document.createElement('label');
+      item.className = 'case-item' + (selected.has(s.num) ? ' is-checked' : '');
+      item.dataset.accent = s.accent;
+      item.innerHTML = `<input type="checkbox" ${selected.has(s.num)?'checked':''}>` +
+        `<span class="case-swatch"></span>` +
+        `<span class="case-text"><b>Case ${s.num}</b>${s.label}</span>`;
+      const cb = item.querySelector('input');
+      cb.addEventListener('change', ()=>{
+        if(cb.checked) selected.add(s.num); else selected.delete(s.num);
+        item.classList.toggle('is-checked', cb.checked);
+        restart();
+      });
+      list.appendChild(item);
+    });
+  }
+
+  document.getElementById('selAll').addEventListener('click', ()=>{
+    STRATEGIES.forEach(s=>selected.add(s.num));
+    renderSidebar(); restart();
+  });
+  document.getElementById('selNone').addEventListener('click', ()=>{
+    selected.clear();
+    renderSidebar(); restart();
+  });
+
   function setup(){
     currentAircraft = AIRCRAFT.find(a=>a.id===select.value);
     model = buildModel(currentAircraft);
@@ -623,38 +708,43 @@
 
     const rngMeta = mulberry32(seed);
     seatMetaShared = buildSeatMeta(seats, rngMeta);
-    const rng1 = mulberry32(seed+1);
-    const rng2 = mulberry32(seed+2);
-    const built1 = buildWMA(seats, rng1);
-    const built2 = buildSections(seats, model.rows, rng2);
-    sim1 = createSim(built1, seatsIndex, model.numAisles, model.rows);
-    sim2 = createSim(built2, seatsIndex, model.numAisles, model.rows);
-    bounds1 = boundariesFrom(sim1.groupSizes);
-    bounds2 = boundariesFrom(sim2.groupSizes);
 
-    buildGrid(document.getElementById('grid-1'), model);
-    buildGrid(document.getElementById('grid-2'), model);
-    renderPhases(document.getElementById('phases-1'), sim1.groupLabels);
-    renderPhases(document.getElementById('phases-2'), sim2.groupLabels);
+    const planesEl = document.getElementById('planes');
+    planesEl.innerHTML = '';
+    const active = STRATEGIES.filter(s=>selected.has(s.num));
+
+    runners = active.map(strategy=>{
+      const rng = mulberry32(seed + strategy.num*97 + 1);
+      const built = buildForStrategy(strategy, seats, model.rows, rng);
+      const sim = createSim(built, seatsIndex, model.numAisles, model.rows);
+      const bounds = boundariesFrom(sim.groupSizes);
+      const dom = createPanelDOM(strategy, seats.length);
+      planesEl.appendChild(dom.root);
+      buildGrid(dom.gridEl, model);
+      renderPhases(dom.phasesEl, sim.groupLabels);
+      return { strategy, sim, bounds, dom };
+    });
+
+    document.getElementById('emptyState').hidden = runners.length>0;
+    planesEl.hidden = runners.length===0;
     document.getElementById('results').classList.remove('show');
 
     const total = seats.length;
-    document.getElementById('total-1').textContent = total;
-    document.getElementById('total-2').textContent = total;
     document.getElementById('results-sub').textContent = `Total time for every one of the ${total} passengers to be seated.`;
     document.getElementById('ticket-config').innerHTML = `${layoutString(currentAircraft.blocks)} &middot; ${model.rows} ROWS &middot; ${total} SEATS`;
     document.getElementById('ticket-flight').innerHTML = `${currentAircraft.name.toUpperCase()}`;
 
-    render(1, sim1, bounds1, model);
-    render(2, sim2, bounds2, model);
+    runners.forEach(r=> render(r, model));
   }
 
   function tick(){
-    if(!sim1.finished) step(sim1, seatsIndex, seatMetaShared);
-    if(!sim2.finished) step(sim2, seatsIndex, seatMetaShared);
-    render(1, sim1, bounds1, model);
-    render(2, sim2, bounds2, model);
-    if(sim1.finished && sim2.finished){
+    let allDone = runners.length>0;
+    for(const r of runners){
+      if(!r.sim.finished) step(r.sim, seatsIndex, seatMetaShared);
+      render(r, model);
+      if(!r.sim.finished) allDone = false;
+    }
+    if(allDone){
       showResults();
       stopTimer();
       setPlayLabel(false);
@@ -662,31 +752,47 @@
   }
 
   function showResults(){
-    const t1 = sim1.tick, t2 = sim2.tick;
-    const max = Math.max(t1,t2);
-    const el = document.getElementById('results');
-    document.getElementById('barval-1').textContent = fmtTime(t1);
-    document.getElementById('barval-2').textContent = fmtTime(t2);
-    requestAnimationFrame(()=>{
-      document.querySelector('#bar1 .bar-fill').style.width = `${t1/max*100}%`;
-      document.querySelector('#bar2 .bar-fill').style.width = `${t2/max*100}%`;
+    const rowsEl = document.getElementById('barRows');
+    rowsEl.innerHTML = '';
+    const sorted = runners.slice().sort((a,b)=>a.sim.tick-b.sim.tick);
+    const max = Math.max(...runners.map(r=>r.sim.tick));
+    sorted.forEach(r=>{
+      const row = document.createElement('div');
+      row.className = 'bar-row';
+      row.innerHTML = `<div class="bar-label" style="color:var(--${r.strategy.accent})">${r.strategy.label}</div>` +
+        `<div class="bar-track"><div class="bar-fill" style="background:var(--${r.strategy.accent})"><span>${fmtTime(r.sim.tick)}</span></div></div>`;
+      rowsEl.appendChild(row);
+      requestAnimationFrame(()=>{ row.querySelector('.bar-fill').style.width = `${r.sim.tick/max*100}%`; });
     });
-    const faster = t1<=t2
-      ? {name:'Window → Middle → Aisle', slow:'Back → Middle → Front', ft:t1, st:t2, conflicts:sim2.interferenceCount}
-      : {name:'Back → Middle → Front', slow:'Window → Middle → Aisle', ft:t2, st:t1, conflicts:sim1.interferenceCount};
-    const pct = Math.round((faster.st-faster.ft)/faster.st*100);
-    document.getElementById('verdict').innerHTML =
-      `<b>${faster.name}</b> finished in ${fmtTime(faster.ft)}, ${pct}% faster than <b>${faster.slow}</b> at ${fmtTime(faster.st)} &mdash; ` +
-      `which racked up ${faster.conflicts} seat conflict${faster.conflicts===1?'':'s'} along the way.`;
-    el.classList.add('show');
+    const fastest = sorted[0], slowest = sorted[sorted.length-1];
+    const verdictEl = document.getElementById('verdict');
+    if(sorted.length===1){
+      verdictEl.innerHTML = `<b>${fastest.strategy.label}</b> seated everyone in ${fmtTime(fastest.sim.tick)} with ${fastest.sim.interferenceCount} seat conflict${fastest.sim.interferenceCount===1?'':'s'}.`;
+    } else {
+      const pct = Math.round((slowest.sim.tick-fastest.sim.tick)/slowest.sim.tick*100);
+      verdictEl.innerHTML = `<b>${fastest.strategy.label}</b> finished fastest, in ${fmtTime(fastest.sim.tick)} — ${pct}% quicker than <b>${slowest.strategy.label}</b> at ${fmtTime(slowest.sim.tick)}, which racked up ${slowest.sim.interferenceCount} seat conflict${slowest.sim.interferenceCount===1?'':'s'} along the way.`;
+    }
+    document.getElementById('results').classList.add('show');
   }
 
-  function startTimer(){ stopTimer(); timer = setInterval(tick, BASE_DELAY/speedMult); }
+  function startTimer(){
+    stopTimer();
+    if(runners.length===0) return;
+    timer = setInterval(tick, BASE_DELAY/speedMult);
+  }
   function stopTimer(){ if(timer){ clearInterval(timer); timer=null; } }
   function setPlayLabel(isPlaying){ document.getElementById('playBtn').textContent = isPlaying ? 'Pause' : 'Play'; }
 
+  function restart(){
+    stopTimer();
+    setup();
+    if(runners.length>0){ playing = true; setPlayLabel(true); startTimer(); }
+    else { playing = false; setPlayLabel(false); }
+  }
+
   document.getElementById('playBtn').addEventListener('click', ()=>{
-    if(sim1.finished && sim2.finished) return;
+    if(runners.length===0) return;
+    if(runners.every(r=>r.sim.finished)) return;
     playing = !playing;
     setPlayLabel(playing);
     if(playing) startTimer(); else stopTimer();
@@ -694,14 +800,12 @@
 
   document.getElementById('reshuffleBtn').addEventListener('click', ()=>{
     seed = Math.floor(Math.random()*1e9);
-    stopTimer(); setup();
-    playing = true; setPlayLabel(true); startTimer();
+    restart();
   });
 
   select.addEventListener('change', ()=>{
     seed = Math.floor(Math.random()*1e9);
-    stopTimer(); setup();
-    playing = true; setPlayLabel(true); startTimer();
+    restart();
   });
 
   document.getElementById('speed').addEventListener('input', (e)=>{
@@ -721,8 +825,8 @@
     });
   })();
 
-  setup();
-  startTimer();
+  renderSidebar();
+  restart();
 
   if (window.claude?.hot) {
     window.claude.hot.ready(function start(){});
