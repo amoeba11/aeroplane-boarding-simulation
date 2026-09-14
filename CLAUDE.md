@@ -25,12 +25,22 @@ Two arrays drive everything and are the main extension points:
   Do not hand-assign seat letters or aisle positions — `buildModel()` derives all
   of that from `blocks`.
 - **`STRATEGIES`** — one entry per boarding order shown in the left sidebar:
-  `{ num, id, label, accent, zones? }`. `num` is a fixed, permanent identity
+  `{ num, id, kind, label, accent, zones? }`. `num` is a fixed, permanent identity
   ("Case N") — it must never be reassigned or renumbered based on which cases are
-  currently selected; selection only controls visibility. `accent` picks a
-  categorical color slot (`c1`/`c2`/`c3`, defined as CSS custom properties). Assign
-  accents in a fixed order as strategies are added — never recolor an existing
-  case when a new one is added.
+  currently selected or how many exist; selection only controls visibility.
+  `accent` picks a categorical color slot (`c1`..`c6`, defined as CSS custom
+  properties, one per strategy currently defined). Assign accents in a fixed
+  order as strategies are added — never recolor an existing case when a new one
+  is added. `kind` selects which builder function `buildForStrategy()` dispatches
+  to (see below).
+
+Users may select **at most `MAX_SELECTED` (currently 3)** strategies to race at
+once — enforced in `updateCaseAvailability()`, which disables the remaining
+unchecked checkboxes once the cap is hit. If you raise the cap, also reconsider
+`.planes`'s `grid-template-columns: repeat(var(--panels,1), 1fr)` (set from
+`runners.length` in `setup()`), which lays every active case out in a single
+horizontal row on desktop — more than 3–4 will get cramped and may need a wrap
+strategy instead of forcing one row.
 
 ### Adding a new aircraft
 
@@ -42,17 +52,25 @@ seat-climbing interference) depends on this being right, not just the seat count
 ### Adding a new boarding order ("Case")
 
 1. Add an entry to `STRATEGIES` with the next `num` and an unused accent slot
-   (add a new `--c4`/`--c4-ink` pair in both the light and dark `:root` blocks if
-   you're past `c3`, plus the matching `.panel[data-accent="c4"] ...` CSS rules —
-   copy the `c3` block as a template).
-2. If it's a row-zone strategy (like Case 2/3), give it a `zones: N` and, if `N`
-   isn't already in `ZONE_NAMES`, add a front-to-back name list there (used to
-   label sections like "Middle-Back Section · Rows 19–24"). Boarding order for
-   zone strategies always goes back-to-front regardless of zone count —
-   `buildZones()` reverses the front-to-back list automatically.
-3. If it's a seat-type strategy (like Case 1's window/middle/aisle), add a
-   `build*()` function following `buildWMA()`'s shape and branch to it in
-   `buildForStrategy()`.
+   (add a new `--cN`/`--cN-ink` pair in all three theme places — bare `:root`,
+   the `prefers-color-scheme: dark` block, and `:root[data-theme="dark"]` —
+   copy an existing pair as a template; no per-property `.panel[data-accent=...]`
+   rules are needed since those read `var(--accent)`/`var(--accent-ink)`, set
+   once per panel from its `data-accent`).
+2. Give it a `kind` and extend `buildForStrategy()`'s switch if it's a genuinely
+   new ordering approach, or reuse an existing `kind`:
+   - `'zones'` / `'zonesReverse'` — row-based sections, back-to-front or
+     front-to-back. Set `zones: N`; if `N` isn't already in `ZONE_NAMES`, add a
+     front-to-back name list there (used to label sections like "Middle-Back
+     Section · Rows 19–24"). `buildZones()` takes a `reverse` flag rather than
+     having two code paths.
+   - `'wma'` — seat-type grouping (window/middle/aisle), zero structural seat
+     conflicts by construction.
+   - `'random'` — one unordered group, a research baseline.
+   - `'steffen'` — Jason Steffen's alternating method (window→middle→aisle, but
+     each split further by aisle-side and row parity into 4 interleaved passes
+     so consecutive boarders are never stowing bags near each other). Uses the
+     per-seat `side` field.
 
 Every strategy must return `{ order, groupSizes, groupLabels }` where `order` is
 a flat array of seat IDs (boarding sequence) and `groupSizes`/`groupLabels` describe
@@ -63,8 +81,9 @@ the phases shown as chips and in the "Now boarding: …" line.
 - Seats are `{row}{letter}` IDs (e.g. `"14A"`), letters skip `I` per aviation
   convention (`LETTERS` constant).
 - Each seat is pre-classified with an `aisleIdx` (which aisle lane it boards
-  through — relevant for twin-aisle aircraft) and `neighborIds` (the seats between
-  it and its aisle, used to detect interference).
+  through — relevant for twin-aisle aircraft), a `side` (`'left'`/`'right'` —
+  which side of that aisle it approaches from, used by the Steffen method), and
+  `neighborIds` (the seats between it and its aisle, used to detect interference).
 - `step()` advances one tick: passengers move one row toward their seat if the
   next row in their aisle lane is free, then stow (a random 4–8 tick delay) once
   they reach their row. A **seat conflict** is counted whenever a passenger starts

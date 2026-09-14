@@ -28,6 +28,12 @@
     --c2-ink: #001c1c;
     --c3: #7a5ac9;
     --c3-ink: #17102e;
+    --c4: #c94f7c;
+    --c4-ink: #3a0a1c;
+    --c5: #3f8f4f;
+    --c5-ink: #0d2a12;
+    --c6: #3b6fd1;
+    --c6-ink: #0a1733;
 
     --cell: 16px;
     --gap: 2px;
@@ -47,6 +53,9 @@
       --c1:#f5ab2e; --c1-ink:#1a1200;
       --c2:#2bc4c4; --c2-ink:#001c1c;
       --c3:#b79cea; --c3-ink:#17102e;
+      --c4:#ed8fb2; --c4-ink:#3a0a1c;
+      --c5:#6fcb7f; --c5-ink:#0d2a12;
+      --c6:#7fa8f5; --c6-ink:#0a1733;
       --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 12px 28px -14px rgba(0,0,0,0.6);
     }
   }
@@ -58,6 +67,9 @@
     --c1:#f5ab2e; --c1-ink:#1a1200;
     --c2:#2bc4c4; --c2-ink:#001c1c;
     --c3:#b79cea; --c3-ink:#17102e;
+    --c4:#ed8fb2; --c4-ink:#3a0a1c;
+    --c5:#6fcb7f; --c5-ink:#0d2a12;
+    --c6:#7fa8f5; --c6-ink:#0a1733;
     --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 12px 28px -14px rgba(0,0,0,0.6);
   }
 
@@ -129,6 +141,7 @@
     color:var(--text-secondary);text-decoration:underline;text-underline-offset:2px;cursor:pointer;
   }
   .linklike:hover{color:var(--text-primary);}
+  .sidebar-hint{margin:0 0 12px;font-size:11.5px;color:var(--text-muted);}
   .case-list{display:flex;flex-direction:column;gap:8px;}
   .case-item{
     display:flex; align-items:flex-start; gap:9px; padding:10px; border-radius:10px;
@@ -139,6 +152,10 @@
   .case-item[data-accent="c1"]{--accent:var(--c1);}
   .case-item[data-accent="c2"]{--accent:var(--c2);}
   .case-item[data-accent="c3"]{--accent:var(--c3);}
+  .case-item[data-accent="c4"]{--accent:var(--c4);}
+  .case-item[data-accent="c5"]{--accent:var(--c5);}
+  .case-item[data-accent="c6"]{--accent:var(--c6);}
+  .case-item.maxed:not(.is-checked){opacity:.4; cursor:not-allowed;}
   .case-item input{margin:3px 0 0; accent-color:var(--accent); flex-shrink:0;}
   .case-swatch{width:9px;height:9px;border-radius:50%;background:var(--accent);margin-top:5px;flex-shrink:0;}
   .case-text{font-size:12.5px;line-height:1.4;}
@@ -149,27 +166,24 @@
     padding:40px 24px; text-align:center; color:var(--text-secondary); font-size:14px;
   }
 
-  .planes{display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:20px;}
+  .planes{display:grid; grid-template-columns:repeat(var(--panels,1), 1fr); gap:16px;}
+  @media (max-width:780px){ .planes{grid-template-columns:1fr;} }
 
   .panel{
     background:var(--surface); border:1px solid var(--border); border-radius:14px;
     box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column;
   }
-  .panel[data-accent="c1"] .case-name{color:var(--c1);}
-  .panel[data-accent="c2"] .case-name{color:var(--c2);}
-  .panel[data-accent="c3"] .case-name{color:var(--c3);}
-  .panel[data-accent="c1"] .seat.seated{background:var(--c1); border-color:var(--c1);}
-  .panel[data-accent="c2"] .seat.seated{background:var(--c2); border-color:var(--c2);}
-  .panel[data-accent="c3"] .seat.seated{background:var(--c3); border-color:var(--c3);}
-  .panel[data-accent="c1"] .token .dot{background:var(--c1);}
-  .panel[data-accent="c2"] .token .dot{background:var(--c2);}
-  .panel[data-accent="c3"] .token .dot{background:var(--c3);}
-  .panel[data-accent="c1"] .progress-fill{background:var(--c1);}
-  .panel[data-accent="c2"] .progress-fill{background:var(--c2);}
-  .panel[data-accent="c3"] .progress-fill{background:var(--c3);}
-  .panel[data-accent="c1"] .phase-chip.active{background:var(--c1);border-color:var(--c1);color:var(--c1-ink);}
-  .panel[data-accent="c2"] .phase-chip.active{background:var(--c2);border-color:var(--c2);color:var(--c2-ink);}
-  .panel[data-accent="c3"] .phase-chip.active{background:var(--c3);border-color:var(--c3);color:var(--c3-ink);}
+  .panel[data-accent="c1"]{--accent:var(--c1); --accent-ink:var(--c1-ink);}
+  .panel[data-accent="c2"]{--accent:var(--c2); --accent-ink:var(--c2-ink);}
+  .panel[data-accent="c3"]{--accent:var(--c3); --accent-ink:var(--c3-ink);}
+  .panel[data-accent="c4"]{--accent:var(--c4); --accent-ink:var(--c4-ink);}
+  .panel[data-accent="c5"]{--accent:var(--c5); --accent-ink:var(--c5-ink);}
+  .panel[data-accent="c6"]{--accent:var(--c6); --accent-ink:var(--c6-ink);}
+  .panel .case-name{color:var(--accent);}
+  .panel .seat.seated{background:var(--accent); border-color:var(--accent);}
+  .panel .token .dot{background:var(--accent);}
+  .panel .progress-fill{background:var(--accent);}
+  .panel .phase-chip.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
 
   .panel-head{padding:16px 18px 12px;}
   .case-eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600;}
@@ -290,10 +304,11 @@
       <div class="sidebar-head">
         <h2>Boarding Orders</h2>
         <div class="case-actions">
-          <button class="linklike" id="selAll">All</button>
+          <button class="linklike" id="selDefault">Default</button>
           <button class="linklike" id="selNone">None</button>
         </div>
       </div>
+      <p class="sidebar-hint">Choose up to 3 to race at once.</p>
       <div class="case-list" id="caseList"></div>
     </aside>
 
@@ -330,10 +345,15 @@
     { id:'a380',    name:'Airbus A380 (main deck)',     tagline:'Widebody · double-decker',      blocks:[3,4,3], rows:48 },
   ];
 
+  const MAX_SELECTED = 3;
+
   const STRATEGIES = [
-    { num:1, id:'wma', label:'Window → Middle → Aisle', accent:'c1' },
-    { num:2, id:'z3',  label:'Back → Middle → Front', accent:'c2', zones:3 },
-    { num:3, id:'z5',  label:'Back → Middle-Back → Middle → Middle-Front → Front', accent:'c3', zones:5 },
+    { num:1, id:'wma',     kind:'wma',           label:'Window → Middle → Aisle', accent:'c1' },
+    { num:2, id:'z3',      kind:'zones',         label:'Back → Middle → Front', accent:'c2', zones:3 },
+    { num:3, id:'z5',      kind:'zones',         label:'Back → Middle-Back → Middle → Middle-Front → Front', accent:'c3', zones:5 },
+    { num:4, id:'z3rev',   kind:'zonesReverse',  label:'Front → Middle → Back', accent:'c4', zones:3 },
+    { num:5, id:'random',  kind:'random',        label:'Random (no order)', accent:'c5' },
+    { num:6, id:'steffen', kind:'steffen',       label:'Steffen Method (alternating)', accent:'c6' },
   ];
 
   function mulberry32(a){
@@ -399,7 +419,7 @@
       for(const rs of model.rowSeats){
         seats.push({
           row:r, col:rs.letter, id:`${r}${rs.letter}`,
-          aisleIdx: rs.aisleIdx, type: rs.type,
+          aisleIdx: rs.aisleIdx, type: rs.type, side: rs.aisleSide,
           neighborIds: rs.neighborLetters.map(l=>`${r}${l}`),
         });
       }
@@ -427,22 +447,59 @@
 
   const ZONE_NAMES = { 3:['Front','Middle','Back'], 5:['Front','Middle-Front','Middle','Middle-Back','Back'] };
 
-  function buildZones(seats, rows, n, rng){
+  function zoneRanges(rows, n){
     const bounds = [];
     for(let i=0;i<n;i++) bounds.push(Math.round((i+1)*rows/n));
-    const namesFrontToBack = ZONE_NAMES[n] || Array.from({length:n}, (_,i)=>`Zone ${i+1}`);
-    const zonesFrontToBack = [];
+    const names = ZONE_NAMES[n] || Array.from({length:n}, (_,i)=>`Zone ${i+1}`);
+    const zones = [];
     let prev = 0;
-    for(let i=0;i<n;i++){ zonesFrontToBack.push({start:prev+1, end:bounds[i], name:namesFrontToBack[i]}); prev = bounds[i]; }
-    const zonesBackToFront = zonesFrontToBack.slice().reverse();
-    const groups = zonesBackToFront.map(z=> seats.filter(s=>s.row>=z.start && s.row<=z.end));
-    const labels = zonesBackToFront.map(z=> `${z.name} Section · Rows ${z.start}–${z.end}`);
+    for(let i=0;i<n;i++){ zones.push({start:prev+1, end:bounds[i], name:names[i]}); prev = bounds[i]; }
+    return zones; // front to back
+  }
+
+  function buildZones(seats, rows, n, rng, reverse){
+    const zonesFrontToBack = zoneRanges(rows, n);
+    const orderedZones = reverse ? zonesFrontToBack.slice().reverse() : zonesFrontToBack;
+    const groups = orderedZones.map(z=> seats.filter(s=>s.row>=z.start && s.row<=z.end));
+    const labels = orderedZones.map(z=> `${z.name} Section · Rows ${z.start}–${z.end}`);
     const shuffled = groups.map(g=>shuffle(g,rng));
     return { order: shuffled.flat().map(s=>s.id), groupSizes: groups.map(g=>g.length), groupLabels: labels };
   }
 
+  function buildRandom(seats, rng){
+    const shuffled = shuffle(seats, rng);
+    return { order: shuffled.map(s=>s.id), groupSizes: [seats.length], groupLabels: ['All Passengers (random order)'] };
+  }
+
+  // Jason Steffen's alternating method: board window->middle->aisle (so nobody
+  // ever climbs over a seated neighbor, same as WMA), but within each of those,
+  // alternate between the two sides of the aisle and between odd/even rows so
+  // consecutive boarders are never stowing bags right behind one another.
+  function buildSteffen(seats){
+    const order = [], sizes = [], labels = ['Window Seats (alternating)','Middle Seats (alternating)','Aisle Seats (alternating)'];
+    for(const type of ['window','middle','aisle']){
+      const group = seats.filter(s=>s.type===type);
+      const passes = [ {side:'left',parity:1}, {side:'right',parity:0}, {side:'left',parity:0}, {side:'right',parity:1} ];
+      let typeSeats = [];
+      for(const p of passes){
+        typeSeats = typeSeats.concat(
+          group.filter(s=> s.side===p.side && (s.row%2)===p.parity).sort((a,b)=> b.row-a.row)
+        );
+      }
+      order.push(...typeSeats.map(s=>s.id));
+      sizes.push(typeSeats.length);
+    }
+    return { order, groupSizes: sizes, groupLabels: labels };
+  }
+
   function buildForStrategy(strategy, seats, rows, rng){
-    return strategy.id==='wma' ? buildWMA(seats, rng) : buildZones(seats, rows, strategy.zones, rng);
+    switch(strategy.kind){
+      case 'wma': return buildWMA(seats, rng);
+      case 'zones': return buildZones(seats, rows, strategy.zones, rng, true);
+      case 'zonesReverse': return buildZones(seats, rows, strategy.zones, rng, false);
+      case 'random': return buildRandom(seats, rng);
+      case 'steffen': return buildSteffen(seats);
+    }
   }
 
   function interference(seatId, seatsIndex, seatedSet){
@@ -656,7 +713,7 @@
   let runners = [];
   let playing = true, timer = null, speedMult = 2;
   const BASE_DELAY = 260;
-  const selected = new Set(STRATEGIES.map(s=>s.num));
+  const selected = new Set([1,2,3]);
 
   const select = document.getElementById('aircraft');
   AIRCRAFT.forEach(a=>{
@@ -670,6 +727,16 @@
   select.value = 'a320';
 
   function layoutString(blocks){ return blocks.join('-'); }
+
+  function updateCaseAvailability(){
+    const atMax = selected.size >= MAX_SELECTED;
+    document.querySelectorAll('.case-item').forEach(item=>{
+      const cb = item.querySelector('input');
+      const isChecked = cb.checked;
+      cb.disabled = atMax && !isChecked;
+      item.classList.toggle('maxed', atMax && !isChecked);
+    });
+  }
 
   function renderSidebar(){
     const list = document.getElementById('caseList');
@@ -685,14 +752,17 @@
       cb.addEventListener('change', ()=>{
         if(cb.checked) selected.add(s.num); else selected.delete(s.num);
         item.classList.toggle('is-checked', cb.checked);
+        updateCaseAvailability();
         restart();
       });
       list.appendChild(item);
     });
+    updateCaseAvailability();
   }
 
-  document.getElementById('selAll').addEventListener('click', ()=>{
-    STRATEGIES.forEach(s=>selected.add(s.num));
+  document.getElementById('selDefault').addEventListener('click', ()=>{
+    selected.clear();
+    [1,2,3].forEach(n=>selected.add(n));
     renderSidebar(); restart();
   });
   document.getElementById('selNone').addEventListener('click', ()=>{
@@ -725,6 +795,7 @@
       return { strategy, sim, bounds, dom };
     });
 
+    planesEl.style.setProperty('--panels', runners.length || 1);
     document.getElementById('emptyState').hidden = runners.length>0;
     planesEl.hidden = runners.length===0;
     document.getElementById('results').classList.remove('show');
