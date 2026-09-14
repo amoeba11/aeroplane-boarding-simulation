@@ -233,18 +233,18 @@
     50%{box-shadow:0 0 0 5px var(--surface);}
   }
 
-  .perforation{margin:16px 0 0; border:none; border-top:2px dashed var(--border); position:relative;}
+  .perforation{margin:12px 0 16px; border:none; border-top:2px dashed var(--border); position:relative;}
   .perforation::before,.perforation::after{content:""; position:absolute; top:-7px; width:14px; height:14px; border-radius:50%; background:var(--bg);}
   .perforation::before{left:-25px;}
   .perforation::after{right:-25px;}
 
-  .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:0; padding:14px 18px 18px;}
+  .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:0; padding:6px 0 12px;}
   .stat{padding:0 10px; border-left:1px solid var(--border);}
   .stat:first-child{border-left:none;padding-left:0;}
   .stat-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);}
   .stat-value{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:2px;}
 
-  .progress-track{height:6px;border-radius:4px;background:var(--track-bg);overflow:hidden;margin:16px 18px;}
+  .progress-track{height:6px;border-radius:4px;background:var(--track-bg);overflow:hidden;margin:0 0 14px;}
   .progress-fill{height:100%;width:0%;border-radius:4px;transition:width .25s linear;}
 
   .results{
@@ -607,17 +607,17 @@
       <div class="panel-head">
         <div class="case-eyebrow">Case ${strategy.num}</div>
         <h2 class="case-name">${strategy.label}</h2>
+        <div class="stats">
+          <div class="stat"><div class="stat-label">Seated</div><div class="stat-value mono"><span class="seated">0</span>/<span class="total">${totalSeats}</span></div></div>
+          <div class="stat"><div class="stat-label">Elapsed</div><div class="stat-value mono time">0:00</div></div>
+          <div class="stat"><div class="stat-label">Seat conflicts</div><div class="stat-value mono conflict">0</div></div>
+        </div>
+        <div class="progress-track"><div class="progress-fill"></div></div>
         <div class="phases"></div>
         <div class="now-boarding"></div>
       </div>
-      <div class="plane-shell"><div class="plane-grid"></div></div>
       <hr class="perforation">
-      <div class="progress-track"><div class="progress-fill"></div></div>
-      <div class="stats">
-        <div class="stat"><div class="stat-label">Seated</div><div class="stat-value mono"><span class="seated">0</span>/<span class="total">${totalSeats}</span></div></div>
-        <div class="stat"><div class="stat-label">Elapsed</div><div class="stat-value mono time">0:00</div></div>
-        <div class="stat"><div class="stat-label">Seat conflicts</div><div class="stat-value mono conflict">0</div></div>
-      </div>`;
+      <div class="plane-shell"><div class="plane-grid"></div></div>`;
     return {
       root,
       gridEl: root.querySelector('.plane-grid'),
@@ -712,7 +712,7 @@
   let model, seatsIndex, seatMetaShared, currentAircraft;
   let runners = [];
   let playing = true, timer = null, speedMult = 2;
-  const BASE_DELAY = 260;
+  const BASE_DELAY = 130;
   const selected = new Set([1,2,3]);
 
   const select = document.getElementById('aircraft');
