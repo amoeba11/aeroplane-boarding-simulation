@@ -15,6 +15,21 @@ To preview changes, just open `index.html` in a browser. There is no test suite;
 verify manually by watching a race run to completion (default speed finishes in
 under a minute) and checking the Results panel at the end.
 
+## Deployment
+
+This repo is also served as a static site via GitHub Pages, from `main` / root —
+`index.html` is what's live at https://amoeba11.github.io/aeroplane-boarding-simulation/.
+Any push to `main` deploys automatically (a few seconds to a minute to rebuild);
+there's no separate deploy step to remember.
+
+The masthead's "VISITS" field is a third-party hit-counter badge
+(`hits.sh/amoeba11.github.io/aeroplane-boarding-simulation.svg`) — an `<img>`,
+not a script, so it needs no dependency. It has an `onerror` fallback that hides
+the whole field if the badge fails to load, which is also what happens when this
+same `index.html` is opened as a Claude Artifact instead of via GitHub Pages: the
+Artifact sandbox blocks `<img>` tags from arbitrary external hosts, so the badge
+silently fails there and the field just doesn't show — expected, not a bug.
+
 ## Core data model
 
 Two arrays drive everything and are the main extension points:

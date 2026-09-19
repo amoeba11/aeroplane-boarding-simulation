@@ -94,6 +94,7 @@
     font-size:11px; letter-spacing:0.06em; color:var(--text-muted); text-transform:uppercase;
   }
   .ticket-strip b{color:var(--text-secondary);font-weight:600;}
+  .visit-badge{display:block; height:14px; width:auto; margin-top:3px;}
   .barcode{display:flex;align-items:flex-end;gap:1px;height:22px;}
   .barcode i{display:block;width:2px;background:var(--text-secondary);opacity:.6;}
 
@@ -281,6 +282,7 @@
     <div class="ticket-strip">
       <div>AIRCRAFT<br><b id="ticket-config">&nbsp;</b></div>
       <div>FLIGHT<br><b id="ticket-flight">&nbsp;</b></div>
+      <div id="visits-field">VISITS<br><b><img class="visit-badge" src="https://hits.sh/amoeba11.github.io/aeroplane-boarding-simulation.svg?style=flat-square&label=&color=3a4160" alt="page visit count" loading="lazy" onerror="document.getElementById('visits-field').hidden=true"></b></div>
       <div class="barcode" aria-hidden="true"></div>
     </div>
   </div>
