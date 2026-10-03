@@ -1,5 +1,7 @@
 # Boarding Call
 
+**▶ Live: [amoeba11.github.io/aeroplane-boarding-simulation](https://amoeba11.github.io/aeroplane-boarding-simulation/)**
+
 A single-page simulator that races airplane boarding strategies seat by seat, on any of ten real aircraft. Pick up to 3 boarding orders from the sidebar and they board the same plane side by side, in one row:
 
 - **Case 1 — Window → Middle → Aisle**: everyone with a window seat boards first, then middle, then aisle. Structurally has zero seat conflicts.
